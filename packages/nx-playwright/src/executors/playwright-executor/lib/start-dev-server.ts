@@ -16,11 +16,16 @@ export const startDevServer = async (opts: PlaywrightExecutorSchema, context: Ex
   }
 
   const [project, target, configuration] = opts.devServerTarget.split(':');
-
+  const devServerTargetOpts = readTargetOptions(
+    { project, target, configuration },
+    context
+  );
+  const targetSupportsWatchOpt =
+    Object.keys(devServerTargetOpts).includes('watch');
   async function unwrapAsyncIterableIteratorPromise() {
     for await (const output of await runExecutor<ExecutorResult>(
       { project, target, configuration },
-      {},
+      targetSupportsWatchOpt ? { watch: opts.watch } : {},
       context,
     ))
       return output;
